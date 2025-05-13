@@ -10,13 +10,21 @@ import java.util.Objects;
 
 @Slf4j
 public class LogAdvisor implements CallAroundAdvisor, StreamAroundAdvisor {
+    public static final String LOG_SWITCH = "log_advisor_switcher";
+
     private AdvisedRequest before(AdvisedRequest request) {
-        log.info("在AdvisedRequest中->{}", request.toString());
+        Boolean switcher = (Boolean) request.adviseContext().get(LOG_SWITCH);
+        if (switcher) {
+            log.info("在AdvisedRequest中->{}", request.toString());
+        }
         return request;
     }
 
     private AdvisedResponse after(AdvisedResponse advisedResponse) {
-        log.info("在advisedRespone中->{}", advisedResponse.toString());
+        Boolean switcher = (Boolean) advisedResponse.adviseContext().get(LOG_SWITCH);
+        if (switcher) {
+            log.info("在advised Respone中->{}", advisedResponse.toString());
+        }
         return advisedResponse;
     }
 
