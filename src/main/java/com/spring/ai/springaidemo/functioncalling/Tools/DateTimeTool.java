@@ -20,8 +20,8 @@ public class DateTimeTool {
 
     @Tool(description = "Set a user alarm for the given time, provided in ISO-8601 format, set time string returned")
     String setAlarm(@ToolParam(description = "参数类型是ISO-8601") String time) {
+        logger.info("Alarm set for :{}.", time);
         LocalDateTime alarmTime = LocalDateTime.parse(time, DateTimeFormatter.ISO_DATE_TIME);
-        logger.info("Alarm set for :{}.", alarmTime);
         return alarmTime.toString();
     }
 }
