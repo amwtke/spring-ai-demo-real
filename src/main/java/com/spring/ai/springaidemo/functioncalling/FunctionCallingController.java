@@ -23,14 +23,13 @@ public class FunctionCallingController {
     }
 
     @RequestMapping(value = "/ai/tool", produces = "text/html;charset=utf-8")
-    public Flux<String> testToolCalling(@RequestParam(value = "msg", defaultValue = "现在几点了？") String msg) {
+    public String testToolCalling(@RequestParam(value = "msg", defaultValue = "现在几点了？") String msg) {
         log.info("msg = {}", msg);
         return openAiChatClientBuilder.build()
                 .prompt(msg)
                 .tools(new DateTimeTool(), new WeatherLocationForDaysTool(), new AdvisorLogSwitchTool(logAdvisor))
-//                .tools("AdvisorLogSwitcherTool")
                 .advisors(logAdvisor)
-                .stream()
+                .call()
                 .content();
     }
 }
