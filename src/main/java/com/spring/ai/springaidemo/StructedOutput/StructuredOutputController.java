@@ -2,26 +2,33 @@ package com.spring.ai.springaidemo.StructedOutput;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.spring.ai.springaidemo.ChatClient.advisors.LogAdvisor;
 import com.spring.ai.springaidemo.StructedOutput.models.ActorFiles;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import reactor.core.publisher.Flux;
 
 @RestController
 public class StructuredOutputController {
 
-    private final ChatClient openAiChatClient;
+    private final ChatClient.Builder openAiChatClientBuilder;
+    private final LogAdvisor logAdvisor;
 
-    StructuredOutputController(ChatClient openAiChatClient) {
-        this.openAiChatClient = openAiChatClient;
+    StructuredOutputController(ChatClient.Builder openAiChatClientBuilder, LogAdvisor logAdvisor) {
+        this.openAiChatClientBuilder = openAiChatClientBuilder;
+        this.logAdvisor = logAdvisor;
     }
 
-    @GetMapping(value = "/ai/cc/actor_files", produces = "text/json;charset=utf-8")
-    public String genStructuredOutput(@RequestParam(value = "msg", defaultValue = "tom hanks") String msg) {
-        ActorFiles actor = openAiChatClient.prompt()
-                .user(u -> u.text("Generate the filmography of 5 movies for {actor}.").param("actor", msg))
+    @GetMapping(value = "/ai/cc/people_works", produces = "text/json;charset=utf-8")
+    public String genStructuredOutput(@RequestParam(value = "name", defaultValue = "tom hanks") String msg,
+                                      @RequestParam(value = "nr", defaultValue = "5") Integer nr) {
+        ActorFiles actor = openAiChatClientBuilder.build().prompt()
+                .user(u -> u.text("生成{people}的{nr}部作品结果。")
+                        .param("people", msg)
+                        .param("nr", nr)
+                )
+                .advisors(logAdvisor)
                 .call()
                 .entity(ActorFiles.class);
 
